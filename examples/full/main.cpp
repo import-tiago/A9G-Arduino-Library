@@ -161,7 +161,7 @@ void loop() {
 		/*
 		
 		NOTE:
-		- Send JSON through AT commands is not possible becouse the double quotes ["].
+		- Send JSON through AT commands is not possible because the double quotes ["].
 		- That are unfortunately interpreted according to AT commands ETSI specification as the beginning of a string parameter.
 		- So, is impossible send a JSON string as a parameter.
 		- Use simple quotes ['] could be a option, but will require the server to replace it with double quotes.
