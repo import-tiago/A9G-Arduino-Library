@@ -62,6 +62,16 @@ void loop() {
 
 	if (millis() - t0 > 1000) {
 		t0 = millis();
+		
+		/*
+		
+		NOTE:
+		- Send JSON through AT commands is not possible becouse the double quotes ["].
+		- That are unfortunately interpreted according to AT commands ETSI specification as the beginning of a string parameter.
+		- So, is impossible send a JSON string as a parameter.
+		- Use simple quotes ['] could be a option, but will require the server to replace it with double quotes.
+		
+		*/
 
 		static char gpsData[100];
 		sprintf(gpsData, "{\'location\':{\'lat\':%.8f,\'lng\':%.8f,\'qty\':%.0f}}", GPS.location(LAT), GPS.location(LNG), GPS.location(QTY));
