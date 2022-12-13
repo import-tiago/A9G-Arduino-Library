@@ -4,21 +4,21 @@
 #define A9G_RESET_PIN 26
 #define A9G_INIT_PIN 4
 
-#define NETWORK_APN "xpto.com.br"
+#define NETWORK_APN (char*)"xpto.com.br"
 
-#define MQTT_BROKER_ADDR "mqtt.xpto.io"
+#define MQTT_BROKER_ADDR (char*)"mqtt.xpto.io"
 #define MQTT_BROKER_PORT 1883
-#define MQTT_BROKER_AUTH_USER "xpto"
-#define MQTT_BROKER_AUTH_PASSWORD "xpto"
+#define MQTT_BROKER_AUTH_USER (char*)"xpto"
+#define MQTT_BROKER_AUTH_PASSWORD (char*)"xpto"
 
-#define MQTT_CLIENT_ID "A9G"
+#define MQTT_CLIENT_ID (char*)"A9G"
 #define MQTT_CLIENT_KEEPALIVE_SECS 120
 
-#define MQTT_PUB_TOPIC "pub"
-#define MQTT_PUB_PAYLOAD "Hello World!"
+#define MQTT_PUB_TOPIC (char*)"pub"
+#define MQTT_PUB_PAYLOAD (char*)"Hello World!"
 #define MQTT_PUB_QOS 1
 
-#define MQTT_SUB_TOPIC "sub"
+#define MQTT_SUB_TOPIC (char*)"sub"
 #define MQTT_SUB_QOS 1
 
 #define GPS_REFRESH_INTERVAL_SECS 5
