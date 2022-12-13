@@ -19,6 +19,8 @@
  // GPRS ----------------------------------------------
 #define GPRS_UART_BUFFER_LEN 200
 #define GPRS_UART_BAUDRATE 115200
+#define RSSI_LEVEL 0
+#define PERCENTAGE_LEVEL 1
 extern char gprs_uart_buffer[GPRS_UART_BUFFER_LEN];
 extern unsigned int gprs_uart_buffer_index;
 extern HardwareSerial* cmds_port;
@@ -89,12 +91,14 @@ public:
 	}
 
 	char* get_imei();
+	uint16_t signal_level(uint8_t output_type);
 	bool cellular_network_connect(char* network_apn);
 	bool mqtt_connect_broker(char* host_address, unsigned int host_port, char* host_user, char* host_password, char* client_id, unsigned int client_time_alive);
 	bool mqtt_publish(char* topic, char* payload, uint8_t qos);
 	bool mqtt_subscribe(char* topic, uint8_t qos, voidFuncPtr CallBackFuncitonPointer);
 	bool mqtt_unsubscribe(char* topic, uint8_t qos);
 	void mqtt_loop();
+
 };
 
 
