@@ -21,6 +21,7 @@ GPRS_Controller GPRS(Serial2);
 
 void mqtt_callback(char* topic, char* payload, int length) {
 	Serial.printf("\r\nFrom MQTT subscription: topic: %s, payload: %s, length: %d\r\n\r\n", topic, payload, length);
+	// GPRS.mqtt_unsubscribe(MQTT_SUB_TOPIC, MQTT_SUB_QOS);
 }
 
 void setup() {
