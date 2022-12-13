@@ -72,6 +72,7 @@ void setup() {
 				}
 				if (step) {
 					Serial.printf("\r\n\r\nIMEI: %s\r\n", GPRS.get_imei());
+					Serial.printf("\rSignal quality: %u%%\r\n", GPRS.signal_level(PERCENTAGE_LEVEL));
 					step++;
 				}
 				break;
@@ -131,17 +132,16 @@ void loop() {
 
 	static uint32_t t0 = millis();
 
-	if (millis() - t0 > 1000) {
+	if (millis() - t0 > 10000) {
 		t0 = millis();
 
 		static char payload[100];
 		sprintf(payload, "{\'location\':{\'lat\':%.8f,\'lng\':%.8f,\'qty\':%.0f}}", GPS.location(LAT), GPS.location(LNG), GPS.location(QTY));
-		Serial.println(payload);
 
 		/*
 			NOTE:
 			- Send JSON through AT commands is not possible because the double quotes ["].
-			- That are unfortunately interpreted according to AT commands ETSI specification as the beginning of a string parameter.
+			- That are unfortunately interpreted (according to AT commands ETSI specification) as the beginning of a string parameter.
 			- So, is impossible send a JSON string as a parameter.
 			- Use simple quotes ['] could be a option, but will require the server to replace it with double quotes.
 		*/
