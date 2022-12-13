@@ -23,6 +23,8 @@
 
 #define GPS_REFRESH_INTERVAL_SECS 5
 
+#define MODEM_INIT_TIMEOUT_SECS 120
+
 A9G_Controller A9G(A9G_RESET_PIN, A9G_INIT_PIN);
 GPS_Controller GPS(Serial1);
 GPRS_Controller GPRS(Serial2);
@@ -35,7 +37,7 @@ void setup() {
 
 	Serial.begin(115200);
 
-	while (!A9G.turn_on(120)) {
+	while (!A9G.turn_on(MODEM_INIT_TIMEOUT_SECS)) {
 		Serial.println("\r\nA9G init fail. Retrying...\r\n");
 		A9G.turn_off();
 	}
@@ -55,26 +57,26 @@ void setup() {
 
 void loop() {
 
-	serialEventRun();
+	A9G.loop();
 	GPRS.mqtt_loop();
 
 	static uint32_t t0 = millis();
 
 	if (millis() - t0 > 1000) {
 		t0 = millis();
-		
+
+		static char payload[100];
+		sprintf(payload, "{\'location\':{\'lat\':%.8f,\'lng\':%.8f,\'qty\':%.0f}}", GPS.location(LAT), GPS.location(LNG), GPS.location(QTY));
+		Serial.println(payload);
+
 		/*
-		
-		NOTE:
-		- Send JSON through AT commands is not possible because the double quotes ["].
-		- That are unfortunately interpreted according to AT commands ETSI specification as the beginning of a string parameter.
-		- So, is impossible send a JSON string as a parameter.
-		- Use simple quotes ['] could be a option, but will require the server to replace it with double quotes.
-		
+			NOTE:
+			- Send JSON through AT commands is not possible because the double quotes ["].
+			- That are unfortunately interpreted according to AT commands ETSI specification as the beginning of a string parameter.
+			- So, is impossible send a JSON string as a parameter.
+			- Use simple quotes ['] could be a option, but will require the server to replace it with double quotes.
 		*/
 
-		static char gpsData[100];
-		sprintf(gpsData, "{\'location\':{\'lat\':%.8f,\'lng\':%.8f,\'qty\':%.0f}}", GPS.location(LAT), GPS.location(LNG), GPS.location(QTY));
-		Serial.println(gpsData);
+		GPRS.mqtt_publish((char*)"GPS", payload, MQTT_PUB_QOS);
 	}
 }

@@ -23,12 +23,15 @@
 
 #define GPS_REFRESH_INTERVAL_SECS 5
 
+#define MODEM_INIT_TIMEOUT_SECS 120
+
 A9G_Controller A9G(A9G_RESET_PIN, A9G_INIT_PIN);
 GPS_Controller GPS(Serial1);
 GPRS_Controller GPRS(Serial2);
 
 void mqtt_callback(char* topic, char* payload, int length) {
 	Serial.printf("\r\nFrom MQTT subscription: topic: %s, payload: %s, length: %d\r\n\r\n", topic, payload, length);
+	// GPRS.mqtt_unsubscribe(MQTT_SUB_TOPIC, MQTT_SUB_QOS);
 }
 
 void setup() {
@@ -36,33 +39,27 @@ void setup() {
 	Serial.begin(115200);
 
 	uint8_t step = 0;
-	uint8_t error = 0;
-	const uint8_t max_errors = 1;
+
 	do {
 		switch (step) {
+
 			case 0: {
-				while (!A9G.turn_on(120)) {
+				while (!A9G.turn_on(MODEM_INIT_TIMEOUT_SECS)) {
 					Serial.println("\r\nA9G init fail. Retrying...\r\n");
 					A9G.turn_off();
 				}
-
 				Serial.println("\r\n");
-
 				step++;
-				error = 0;
 				break;
 			}
+
 			case 1: {
 				while (!A9G.echo(true)) {
 					Serial.println("\r\nA9G echo mode fail. Retrying...\r\n");
-
-					error++;
-					if (error >= max_errors) {
-						step = 0;
-						break;
-					}
+					step = 0;
+					break;
 				}
-				if (!error)
+				if (step)
 					step++;
 				break;
 			}
@@ -70,14 +67,10 @@ void setup() {
 			case 2: {
 				while (!GPRS.cellular_network_connect(NETWORK_APN)) {
 					Serial.println("\r\nGPRS network connection fail. Retrying...\r\n");
-
-					error++;
-					if (error >= max_errors) {
-						step = 0;
-						break;
-					}
+					step = 0;
+					break;
 				}
-				if (!error) {
+				if (step) {
 					Serial.printf("\r\n\r\nIMEI: %s\r\n", GPRS.get_imei());
 					step++;
 				}
@@ -87,14 +80,10 @@ void setup() {
 			case 3: {
 				while (!GPS.enable(GPS_REFRESH_INTERVAL_SECS)) {
 					Serial.println("\rGPS communication fail. Retrying...\r\n");
-
-					error++;
-					if (error >= max_errors) {
-						step = 0;
-						break;
-					}
+					step = 0;
+					break;
 				}
-				if (!error)
+				if (step)
 					step++;
 				break;
 			}
@@ -102,14 +91,10 @@ void setup() {
 			case 4: {
 				while (!GPRS.mqtt_connect_broker(MQTT_BROKER_ADDR, MQTT_BROKER_PORT, MQTT_BROKER_AUTH_USER, MQTT_BROKER_AUTH_PASSWORD, MQTT_CLIENT_ID, MQTT_CLIENT_KEEPALIVE_SECS)) {
 					Serial.println("\r\nMQTT connection fail. Retrying...\r\n");
-
-					error++;
-					if (error >= max_errors) {
-						step = 0;
-						break;
-					}
+					step = 0;
+					break;
 				}
-				if (!error)
+				if (step)
 					step++;
 				break;
 			}
@@ -117,15 +102,10 @@ void setup() {
 			case 5: {
 				while (!GPRS.mqtt_subscribe(MQTT_SUB_TOPIC, MQTT_SUB_QOS, mqtt_callback)) {
 					Serial.println("\r\nMQTT subscription fail. Retrying...\r\n");
-					//GPRS.mqtt_unsubscribe(MQTT_SUB_TOPIC, MQTT_SUB_QOS);
-
-					error++;
-					if (error >= max_errors) {
-						step = 0;
-						break;
-					}
+					step = 0;
+					break;
 				}
-				if (!error)
+				if (step)
 					step++;
 				break;
 			}
@@ -133,14 +113,10 @@ void setup() {
 			case 6: {
 				while (!GPRS.mqtt_publish(MQTT_PUB_TOPIC, MQTT_PUB_PAYLOAD, MQTT_PUB_QOS)) {
 					Serial.println("\r\nMQTT publish fail. Retrying...\r\n");
-
-					error++;
-					if (error >= max_errors) {
-						step = 0;
-						break;
-					}
+					step = 0;
+					break;
 				}
-				if (!error)
+				if (step)
 					step++;
 				break;
 			}
@@ -150,26 +126,26 @@ void setup() {
 
 void loop() {
 
-	serialEventRun();
+	A9G.loop();
 	GPRS.mqtt_loop();
 
 	static uint32_t t0 = millis();
 
 	if (millis() - t0 > 1000) {
 		t0 = millis();
-		
+
+		static char payload[100];
+		sprintf(payload, "{\'location\':{\'lat\':%.8f,\'lng\':%.8f,\'qty\':%.0f}}", GPS.location(LAT), GPS.location(LNG), GPS.location(QTY));
+		Serial.println(payload);
+
 		/*
-		
-		NOTE:
-		- Send JSON through AT commands is not possible because the double quotes ["].
-		- That are unfortunately interpreted according to AT commands ETSI specification as the beginning of a string parameter.
-		- So, is impossible send a JSON string as a parameter.
-		- Use simple quotes ['] could be a option, but will require the server to replace it with double quotes.
-		
+			NOTE:
+			- Send JSON through AT commands is not possible because the double quotes ["].
+			- That are unfortunately interpreted according to AT commands ETSI specification as the beginning of a string parameter.
+			- So, is impossible send a JSON string as a parameter.
+			- Use simple quotes ['] could be a option, but will require the server to replace it with double quotes.
 		*/
 
-		static char gpsData[100];
-		sprintf(gpsData, "{\'location\':{\'lat\':%.8f,\'lng\':%.8f,\'qty\':%.0f}}", GPS.location(LAT), GPS.location(LNG), GPS.location(QTY));
-		Serial.println(gpsData);
+		GPRS.mqtt_publish((char*)"GPS", payload, MQTT_PUB_QOS);
 	}
 }
