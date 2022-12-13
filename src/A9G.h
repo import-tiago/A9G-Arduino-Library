@@ -66,6 +66,7 @@ public:
 	bool turn_on(uint32_t timeout_secs);
 	void turn_off();
 	bool restart(uint32_t timeout_secs);
+	void loop();
 	bool echo(bool mode);
 	int memsearch(char* source, int sourceLen, char* target, int targetLen);
 	bool Send_and_Wait_Response(HardwareSerial& serial, char* command, char* expected_answer, unsigned long timeout);

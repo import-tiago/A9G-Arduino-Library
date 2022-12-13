@@ -78,6 +78,14 @@ bool A9G_Controller::restart(uint32_t timeout_secs) {
 }
 
 /**
+ * @brief It updates data from internal peripherals, reading the GPS and GPRS serial port.
+ *
+ */
+void A9G_Controller::loop() {
+	serialEventRun();
+}
+
+/**
  * @brief allows turning on or off the echo of AT commands
  *
  * @param mode
@@ -107,9 +115,6 @@ int A9G_Controller::memsearch(char* source, int sourceLen, char* target, int tar
 		}
 
 		if (j == targetLen) {
-
-			//for (j = 0; j < targetLen; j++)
-			//	*(source + i + j) = '\0';
 
 			return i;
 		}
@@ -276,13 +281,8 @@ bool GPRS_Controller::mqtt_connect_broker(char* host_address, unsigned int host_
 				sprintf(cmd, "AT+MQTTCONN=\"%s\",%d,\"%s\",%d,1,\"%s\",\"%s\"", host_address, host_port, client_id, client_time_alive, host_user, host_password);
 
 				if (Send_and_Wait_Response(*cmds_port, cmd, "OK", 40000)) {
-
-					//if (memsearch(gprs_uart_buffer, GPRS_UART_BUFFER_LEN, "AT+MQTTCONN=", 12) >= 0) {
-					//	if (memsearch(gprs_uart_buffer, GPRS_UART_BUFFER_LEN, "ERROR", 5) < 0) {
 					step++;
 					error_count = 0;
-					//	}
-					//}
 				}
 				else
 					error_count++;
@@ -339,8 +339,6 @@ bool GPRS_Controller::mqtt_unsubscribe(char* topic, uint8_t qos) {
 void GPRS_Controller::mqtt_loop() {
 
 	if (_CallBackFuncitonPointer) {
-
-
 
 		int i = memsearch(gprs_uart_buffer, GPRS_UART_BUFFER_LEN, "+MQTTPUBLISH:", 13);
 
@@ -425,11 +423,7 @@ void GPRS_Controller::mqtt_loop() {
 
 				payload[z] = '\0';
 
-
-
 				_CallBackFuncitonPointer(topic, payload, payload_len);
-
-
 			}
 		}
 	}
