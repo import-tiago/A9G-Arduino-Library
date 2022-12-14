@@ -122,6 +122,47 @@ int A9G_Controller::memsearch(char* source, int sourceLen, char* target, int tar
 	return -1;
 }
 
+/* #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>   */
+
+char* A9G_Controller::replaceWord(const char* s, const char* oldW, const char* newW) {
+	char* result;
+	int i, cnt = 0;
+	int newWlen = strlen(newW);
+	int oldWlen = strlen(oldW);
+
+	// Counting the number of times old word
+	// occur in the string
+	for (i = 0; s[i] != '\0'; i++) {
+		if (strstr(&s[i], oldW) == &s[i]) {
+			cnt++;
+			// Jumping to index after the old word.
+			i += oldWlen - 1;
+		}
+	}
+
+	// Making new string of enough length
+	result = (char*)malloc(i + cnt * (newWlen - oldWlen) + 1);
+
+	i = 0;
+
+	while (*s) {
+		// compare the substring with the result
+		if (strstr(s, oldW) == s) {
+			strcpy(&result[i], newW);
+			i += newWlen;
+			s += oldWlen;
+		}
+		else
+			result[i++] = *s++;
+	}
+
+	result[i] = '\0';
+
+	return result;
+}
+
 bool A9G_Controller::Send_and_Wait_Response(HardwareSerial& serial, char* cmd, char* expected_answer, unsigned long timeout) {
 
 	bool ret = false;
@@ -326,14 +367,27 @@ bool GPRS_Controller::mqtt_connect_broker(char* host_address, unsigned int host_
 
 bool GPRS_Controller::mqtt_publish(char* topic, char* payload, uint8_t qos) {
 
+	char* result = NULL;
+	bool quoted_payload = false;
+
+	if (strstr(payload, "\"") != NULL) {
+		quoted_payload = true;
+		result = replaceWord(payload, "\"", "\x5c\x32\x32");
+	}
+
 	memset(gprs_uart_buffer, '\0', GPRS_UART_BUFFER_LEN);
 	gprs_uart_buffer_index = 0;
 
 	uint8_t duplicate_flag = 0, retain = 0;
 
-	char cmd[200];
+	char cmd[512];
 
-	sprintf(cmd, "AT+MQTTPUB=\"%s\",\"%s\",%u,%u,%u", topic, payload, duplicate_flag, qos, retain);
+	if (!quoted_payload)
+		sprintf(cmd, "AT+MQTTPUB=\"%s\",\"%s\",%u,%u,%u", topic, payload, duplicate_flag, qos, retain);
+	else {
+		sprintf(cmd, "AT+MQTTPUB=\"%s\",\"%s\",%u,%u,%u", topic, result, duplicate_flag, qos, retain);
+		free(result);
+	}
 
 	return Send_and_Wait_Response(*cmds_port, cmd, (char*)"OK", 30000);
 }
@@ -621,3 +675,4 @@ void serialEvent2() {
 		update_gps_data();
 	}
 }
+

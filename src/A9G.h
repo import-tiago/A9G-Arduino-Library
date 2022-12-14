@@ -12,7 +12,7 @@
 #define A9G_H
 
 #include <Arduino.h>
-#include <decoder/TinyGPS++.h>
+#include "decoder/TinyGPS++.h"
 
 #define DEBUG_SERIAL
 
@@ -51,6 +51,9 @@ void serialEvent2();
 class A9G_Controller {
 private:
 	int8_t _on_off_pin = -1, _init_pin, _reset_pin;
+
+protected:
+	char* replaceWord(const char* s, const char* oldW, const char* newW);
 
 public:
 
