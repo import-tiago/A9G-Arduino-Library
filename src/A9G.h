@@ -12,7 +12,7 @@
 #define A9G_H
 
 #include <Arduino.h>
-#include "decoder/TinyGPS++.h"
+#include "TinyGPS++.h"
 
 #define DEBUG_SERIAL
 
