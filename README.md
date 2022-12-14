@@ -10,6 +10,7 @@ Official A9G repository: [Ai-Thinker GPRS C SDK](https://github.com/Ai-Thinker-O
 
 This library configures the A9G's GPS data output using the [NMEA](https://en.wikipedia.org/wiki/NMEA_0183) data specification. So to decode this [NMEA](https://en.wikipedia.org/wiki/NMEA_0183) packet this library incorporated [Mikal Hart](https://github.com/mikalhart)'s amazing [TinyGPSPlus ](https://github.com/mikalhart/TinyGPSPlus) library.
 
+Big difference compared to other libraries: this one supports JSON as payload in MQTT mode! :information_desk_person:
 
 [Minimal example](https://github.com/TiagoPaulaSilva/A9G-Arduino-Library/blob/main/examples/simple/main.cpp) code snippet: 
 ```c++
