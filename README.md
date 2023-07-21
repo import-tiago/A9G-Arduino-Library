@@ -2,17 +2,17 @@
 
 Library to use A9G with AT commands in Arduino framework-based systems.
 
-<p align="center"><img src="https://github.com/TiagoPaulaSilva/A9G-Arduino-Library/blob/main/assets/A9G_Module_Preview.png" ></p>
+<p align="center"><img src="https://github.com/import-tiago/A9G-Arduino-Library/blob/main/assets/A9G_Module_Preview.png" ></p>
 
 [A9G](http://www.ai-thinker.com/pro_view-28.html) is a quad-band module from [Ai-Thinker](http://www.ai-thinker.com/) based on [RDA8955](https://w.electrodragon.com/w/images/9/97/RDA8955L_Datasheet_v1.0.0.pdf) SoC - [GSM/GPRS] + [GPS/BDS] (850/900/1800/1900MHz).
 
-Official A9G repository: [Ai-Thinker GPRS C SDK](https://github.com/Ai-Thinker-Open/GPRS_C_SDK).
+Official A9G repository: [Ai-Thinker GPRS C SDK](https://github.com/import-tiago-Thinker-Open/GPRS_C_SDK).
 
-This library configures the A9G's GPS data output using the [NMEA](https://en.wikipedia.org/wiki/NMEA_0183) data specification. So to decode this [NMEA](https://en.wikipedia.org/wiki/NMEA_0183) packet this library incorporated [Mikal Hart](https://github.com/mikalhart)'s amazing [TinyGPSPlus ](https://github.com/mikalhart/TinyGPSPlus) library.
+This library configures the A9G's GPS data output using the [NMEA](https://en.wikipedia.org/wiki/NMEA_0183) data specification. So to decode this [NMEA](https://en.wikipedia.org/wiki/NMEA_0183) packet this library incorporated [Mikal Hart](https://github.com/import-tiago)'s amazing [TinyGPSPlus ](https://github.com/import-tiago/TinyGPSPlus) library.
 
 Big difference compared to other libraries: this one supports JSON as payload in MQTT mode! :information_desk_person:
 
-[Minimal example](https://github.com/TiagoPaulaSilva/A9G-Arduino-Library/blob/main/examples/simple/main.cpp) code snippet: 
+[Minimal example](https://github.com/import-tiago/A9G-Arduino-Library/blob/main/examples/simple/main.cpp) code snippet: 
 ```c++
 #include "A9G.h"
 
@@ -73,4 +73,4 @@ void loop() {
 
 # Minimal Hardware
 
-<p align="center"><a href="https://github.com/TiagoPaulaSilva/A9G-Arduino-Library/blob/main/assets/A9G%20Minimal%20Hardware/A9G%20Minimal%20Hardware.pdf"><img src="https://github.com/TiagoPaulaSilva/A9G-Arduino-Library/blob/main/assets/schematic_preview.png"  title="Circuit Preview" alt="PDF Download"></a></p>
+<p align="center"><a href="https://github.com/import-tiago/A9G-Arduino-Library/blob/main/assets/A9G%20Minimal%20Hardware/A9G%20Minimal%20Hardware.pdf"><img src="https://github.com/import-tiago/A9G-Arduino-Library/blob/main/assets/schematic_preview.png"  title="Circuit Preview" alt="PDF Download"></a></p>
